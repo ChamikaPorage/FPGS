@@ -1,0 +1,28 @@
+Package: FPGS
+Title: Full Prognostic Score Methods for Causal Effect Estimation
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Chamika", "Porage",
+           email = "chamika.porage@statistik.uu.se",
+           role = c("aut", "cre")),
+    person("Ingeborg", "Waernbaum",
+           email = "ingeborg.waernbaum@statistik.uu.se",
+           role = "aut")
+    )
+Description: Implements full prognostic score (FPGS) methods for causal
+    effect estimation. The package provides methods for estimating the FPGS
+    using regression and random forest approaches and for estimating average
+    treatment effects using regression imputation, matching, stratification,
+    and weighting estimators.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
+Imports:
+    caret,
+    geex,
+    Matching,
+    ranger
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
