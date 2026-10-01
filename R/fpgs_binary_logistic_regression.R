@@ -67,6 +67,19 @@ fpgs_binary_logistic_regression <- function(data,
     type = "response"
   )
 
+  # Linear predictors for use in second-stage regression
+  eta0_hat <- stats::predict(
+    fit0,
+    newdata = dat,
+    type = "link"
+  )
+
+  eta1_hat <- stats::predict(
+    fit1,
+    newdata = dat,
+    type = "link"
+  )
+
   out <- list(
     data = dat,
     outcome = outcome,
@@ -74,6 +87,8 @@ fpgs_binary_logistic_regression <- function(data,
     covariates = covariates,
     mu0_hat = mu0_hat,
     mu1_hat = mu1_hat,
+    eta0_hat = eta0_hat,
+    eta1_hat = eta1_hat,
     fpgs = data.frame(
       mu0_hat = mu0_hat,
       mu1_hat = mu1_hat

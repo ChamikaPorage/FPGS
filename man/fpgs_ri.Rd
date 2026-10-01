@@ -21,9 +21,11 @@ based on the estimated Full Prognostic Score (FPGS).
 }
 \details{
 For FPGS components estimated using linear or logistic regression,
-treatment-specific regression models are fitted using the two estimated
-FPGS components as predictors. Linear regression is used for continuous
-outcomes and logistic regression is used for binary outcomes.
+treatment-specific regression models are fitted in the second stage.
+For continuous outcomes, linear regression is fitted using the estimated
+FPGS components as predictors. For binary outcomes with logistic-regression
+FPGS estimation, logistic regression is fitted using the corresponding
+linear predictors (logit-transformed FPGS components).
 
 For FPGS components estimated using random forest, random forest with
 cross-fitting is used in the second stage.

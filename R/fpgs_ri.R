@@ -4,9 +4,11 @@
 #' based on the estimated Full Prognostic Score (FPGS).
 #'
 #' For FPGS components estimated using linear or logistic regression,
-#' treatment-specific regression models are fitted using the two estimated
-#' FPGS components as predictors. Linear regression is used for continuous
-#' outcomes and logistic regression is used for binary outcomes.
+#' treatment-specific regression models are fitted in the second stage.
+#' For continuous outcomes, linear regression is fitted using the estimated
+#' FPGS components as predictors. For binary outcomes with logistic-regression
+#' FPGS estimation, logistic regression is fitted using the corresponding
+#' linear predictors (logit-transformed FPGS components).
 #'
 #' For FPGS components estimated using random forest, random forest with
 #' cross-fitting is used in the second stage.
@@ -65,6 +67,24 @@ fpgs_ri <- function(fit) {
   )
 
   # ----------------------------------------------------------
+  # Add linear predictors for logistic-regression FPGS
+  # ----------------------------------------------------------
+
+  if (fit$method == "logistic_regression") {
+
+    if (is.null(fit$eta0_hat) || is.null(fit$eta1_hat)) {
+      stop(
+        "Linear predictors eta0_hat and eta1_hat are required ",
+        "for logistic-regression FPGS.",
+        call. = FALSE
+      )
+    }
+
+    fpgs_dat$eta0_hat <- fit$eta0_hat
+    fpgs_dat$eta1_hat <- fit$eta1_hat
+  }
+
+  # ----------------------------------------------------------
   # Check FPGS values
   # ----------------------------------------------------------
 
@@ -121,17 +141,45 @@ fpgs_ri <- function(fit) {
 
     if (fit$outcome_type == "binary") {
 
-      model0 <- stats::glm(
-        Y ~ mu0_hat + mu1_hat,
-        data = fpgs_dat[Tr == 0, , drop = FALSE],
-        family = stats::binomial()
-      )
+      # ------------------------------------------------------
+      # Logistic-regression FPGS:
+      # use linear predictors (logit-transformed FPGS)
+      # ------------------------------------------------------
 
-      model1 <- stats::glm(
-        Y ~ mu0_hat + mu1_hat,
-        data = fpgs_dat[Tr == 1, , drop = FALSE],
-        family = stats::binomial()
-      )
+      if (fit$method == "logistic_regression") {
+
+        model0 <- stats::glm(
+          Y ~ eta0_hat + eta1_hat,
+          data = fpgs_dat[Tr == 0, , drop = FALSE],
+          family = stats::binomial()
+        )
+
+        model1 <- stats::glm(
+          Y ~ eta0_hat + eta1_hat,
+          data = fpgs_dat[Tr == 1, , drop = FALSE],
+          family = stats::binomial()
+        )
+      }
+
+      # ------------------------------------------------------
+      # Externally supplied FPGS:
+      # use supplied FPGS components
+      # ------------------------------------------------------
+
+      if (fit$method == "external") {
+
+        model0 <- stats::glm(
+          Y ~ mu0_hat + mu1_hat,
+          data = fpgs_dat[Tr == 0, , drop = FALSE],
+          family = stats::binomial()
+        )
+
+        model1 <- stats::glm(
+          Y ~ mu0_hat + mu1_hat,
+          data = fpgs_dat[Tr == 1, , drop = FALSE],
+          family = stats::binomial()
+        )
+      }
 
       pred0 <- stats::predict(
         model0,
@@ -147,6 +195,10 @@ fpgs_ri <- function(fit) {
 
       second_stage <- "logistic regression"
     }
+
+    # --------------------------------------------------------
+    # Average treatment effect
+    # --------------------------------------------------------
 
     ate <- mean(pred1 - pred0)
 
@@ -310,6 +362,10 @@ fpgs_ri <- function(fit) {
         pred1[test_index] <- prediction1[, "1"]
       }
     }
+
+    # --------------------------------------------------------
+    # Average treatment effect
+    # --------------------------------------------------------
 
     ate <- mean(pred1 - pred0)
 
