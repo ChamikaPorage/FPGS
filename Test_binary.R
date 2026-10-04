@@ -10,7 +10,7 @@ library(FPGS)
 
 ### Read data
 datat <- read.csv(
-  "C:/Users/chapo752/Dropbox/PhD work- Chamika Porage/Paper3_Disease risk score/Simulation_study/Simulation_new/Empirical analysis/df.csv"
+  "..../Empirical analysis/df.csv"
 )
 
 ### Inspect outcome and treatment variables
