@@ -12,7 +12,7 @@ library(FPGS)
 ### Read data
 
 datat <- read.csv(
-  "..../Emp_ana_new/df_all.csv"
+  "df_all.csv"
 )
 
 ###  Recode gender
