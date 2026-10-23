@@ -10,7 +10,7 @@ library(FPGS)
 
 ### Read data
 datat <- read.csv(
-  "..../Empirical analysis/df.csv"
+  "df.csv"
 )
 
 ### Inspect outcome and treatment variables
